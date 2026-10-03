@@ -1,0 +1,69 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.16)
+
+2026-10-03T21:14:46.670+05:30  INFO 22648 --- [typerush-server] [           main] com.typerush.TypeRushApplication         : Starting TypeRushApplication v1.0.0 using Java 21.0.10 with PID 22648 (E:\typing-race\backend\target\typerush-server-1.0.0.jar started by aashu in E:\typing-race\backend)
+2026-10-03T21:14:46.680+05:30  INFO 22648 --- [typerush-server] [           main] com.typerush.TypeRushApplication         : No active profile set, falling back to 1 default profile: "default"
+2026-10-03T21:14:49.254+05:30  INFO 22648 --- [typerush-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-03T21:14:49.470+05:30  INFO 22648 --- [typerush-server] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 183 ms. Found 3 JPA repository interfaces.
+2026-10-03T21:14:52.013+05:30  INFO 22648 --- [typerush-server] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2026-10-03T21:14:52.144+05:30  INFO 22648 --- [typerush-server] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-03T21:14:52.149+05:30  INFO 22648 --- [typerush-server] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.55]
+2026-10-03T21:14:52.327+05:30  INFO 22648 --- [typerush-server] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-10-03T21:14:52.331+05:30  INFO 22648 --- [typerush-server] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 5500 ms
+2026-10-03T21:14:52.931+05:30  INFO 22648 --- [typerush-server] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-03T21:14:53.153+05:30  INFO 22648 --- [typerush-server] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.53.Final
+2026-10-03T21:14:53.315+05:30  INFO 22648 --- [typerush-server] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-10-03T21:14:54.502+05:30  INFO 22648 --- [typerush-server] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-03T21:14:54.620+05:30  INFO 22648 --- [typerush-server] [           main] com.zaxxer.hikari.HikariDataSource       : typerush-pool - Starting...
+2026-10-03T21:14:55.313+05:30  INFO 22648 --- [typerush-server] [           main] com.zaxxer.hikari.pool.HikariPool        : typerush-pool - Added connection com.mysql.cj.jdbc.ConnectionImpl@7f2c995b
+2026-10-03T21:14:55.319+05:30  INFO 22648 --- [typerush-server] [           main] com.zaxxer.hikari.HikariDataSource       : typerush-pool - Start completed.
+2026-10-03T21:14:55.535+05:30  WARN 22648 --- [typerush-server] [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-03T21:14:55.597+05:30  INFO 22648 --- [typerush-server] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (typerush-pool)']
+	Database driver: undefined/unknown
+	Database version: 8.4.11
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-03T21:14:58.185+05:30  INFO 22648 --- [typerush-server] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-03T21:14:58.521+05:30  INFO 22648 --- [typerush-server] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-03T21:14:59.601+05:30  INFO 22648 --- [typerush-server] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-03T21:15:03.456+05:30  INFO 22648 --- [typerush-server] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2026-10-03T21:15:03.534+05:30  INFO 22648 --- [typerush-server] [           main] com.typerush.TypeRushApplication         : Started TypeRushApplication in 18.596 seconds (process running for 20.34)
+2026-10-03T21:15:03.918+05:30  INFO 22648 --- [typerush-server] [           main] com.typerush.game.TextSeeder             : Text snippets already present, skipping seed
+2026-10-03T21:15:05.365+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-03T21:15:05.367+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-03T21:15:05.371+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-10-03T21:25:02.981+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-7] com.typerush.game.RoomManager            : Quick match paired 2 players into room EYY37
+2026-10-03T21:25:03.197+05:30  INFO 22648 --- [typerush-server] [   scheduling-1] com.typerush.game.RoomManager            : Race EYY37-1 starting in room EYY37 with 2 racers
+2026-10-03T21:25:07.306+05:30  WARN 22648 --- [typerush-server] [io-8081-exec-10] com.typerush.game.RoomManager            : Clamped progress claim for Bob in EYY37: +302 claimed, +7 allowed
+2026-10-03T21:25:07.307+05:30  WARN 22648 --- [typerush-server] [nio-8081-exec-9] com.typerush.game.RoomManager            : Clamped progress claim for Alice in EYY37: +302 claimed, +7 allowed
+2026-10-03T21:25:07.307+05:30  WARN 22648 --- [typerush-server] [io-8081-exec-10] com.typerush.game.RoomManager            : Clamped progress claim for Bob in EYY37: +295 claimed, +5 allowed
+2026-10-03T21:25:07.308+05:30  INFO 22648 --- [typerush-server] [io-8081-exec-10] com.typerush.game.RoomManager            : Bob finished race EYY37-1 in 1 place at 260.0 wpm
+2026-10-03T21:25:07.315+05:30  WARN 22648 --- [typerush-server] [nio-8081-exec-9] com.typerush.game.RoomManager            : Clamped progress claim for Alice in EYY37: +295 claimed, +5 allowed
+2026-10-03T21:25:07.315+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-9] com.typerush.game.RoomManager            : Alice finished race EYY37-1 in 2 place at 260.0 wpm
+2026-10-03T21:25:07.331+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-9] com.typerush.game.RoomManager            : Race EYY37-1 closed in room EYY37: 2 standings
+2026-10-03T21:25:07.782+05:30  INFO 22648 --- [typerush-server] [ace-persistence] c.t.game.ResultPersistenceService        : Recorded Bob in race EYY37-1 as place 1 (260.0 wpm, flagged=true)
+2026-10-03T21:25:07.841+05:30  INFO 22648 --- [typerush-server] [ace-persistence] c.t.game.ResultPersistenceService        : Recorded Alice in race EYY37-1 as place 2 (260.0 wpm, flagged=true)
+2026-10-03T21:25:25.652+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-2] com.typerush.game.RoomManager            : Quick match paired 2 players into room GYKJG
+2026-10-03T21:25:25.666+05:30  INFO 22648 --- [typerush-server] [   scheduling-1] com.typerush.game.RoomManager            : Race GYKJG-1 starting in room GYKJG with 2 racers
+2026-10-03T21:26:19.092+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-4] com.typerush.game.RoomManager            : Alice finished race GYKJG-1 in 1 place at 78.3 wpm
+2026-10-03T21:26:30.811+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-8] com.typerush.game.RoomManager            : Bob finished race GYKJG-1 in 2 place at 63.2 wpm
+2026-10-03T21:26:30.814+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-8] com.typerush.game.RoomManager            : Race GYKJG-1 closed in room GYKJG: 2 standings
+2026-10-03T21:26:30.899+05:30  INFO 22648 --- [typerush-server] [ace-persistence] c.t.game.ResultPersistenceService        : Recorded Alice in race GYKJG-1 as place 1 (78.3 wpm, flagged=false)
+2026-10-03T21:26:30.961+05:30  INFO 22648 --- [typerush-server] [ace-persistence] c.t.game.ResultPersistenceService        : Recorded Bob in race GYKJG-1 as place 2 (63.2 wpm, flagged=false)
+2026-10-03T21:26:39.481+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-9] com.typerush.game.RoomManager            : Quick match paired 2 players into room NQR5T
+2026-10-03T21:26:39.521+05:30  INFO 22648 --- [typerush-server] [   scheduling-1] com.typerush.game.RoomManager            : Race NQR5T-1 starting in room NQR5T with 2 racers
+2026-10-03T21:27:33.028+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-3] com.typerush.game.RoomManager            : Alice finished race NQR5T-1 in 1 place at 78.1 wpm
+2026-10-03T21:27:44.781+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-8] com.typerush.game.RoomManager            : Bob finished race NQR5T-1 in 2 place at 63.1 wpm
+2026-10-03T21:27:44.782+05:30  INFO 22648 --- [typerush-server] [nio-8081-exec-8] com.typerush.game.RoomManager            : Race NQR5T-1 closed in room NQR5T: 2 standings
+2026-10-03T21:27:44.848+05:30  INFO 22648 --- [typerush-server] [ace-persistence] c.t.game.ResultPersistenceService        : Recorded Alice in race NQR5T-1 as place 1 (78.1 wpm, flagged=false)
+2026-10-03T21:27:44.911+05:30  INFO 22648 --- [typerush-server] [ace-persistence] c.t.game.ResultPersistenceService        : Recorded Bob in race NQR5T-1 as place 2 (63.1 wpm, flagged=false)
