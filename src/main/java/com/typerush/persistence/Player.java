@@ -54,10 +54,12 @@ public class Player {
     @Column(name = "total_typing_ms", nullable = false)
     private long totalTypingMs;
 
-    @Column(name = "created_at", nullable = false)
+    // Plain DATETIME rather than DATETIME(6): MySQL 5.5 (some free hosts) rejects fractional
+    // seconds. Second precision is all this data needs.
+    @Column(name = "created_at", nullable = false, columnDefinition = "datetime")
     private Instant createdAt;
 
-    @Column(name = "last_seen_at", nullable = false)
+    @Column(name = "last_seen_at", nullable = false, columnDefinition = "datetime")
     private Instant lastSeenAt;
 
     @PrePersist
