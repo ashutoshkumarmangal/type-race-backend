@@ -1,0 +1,43 @@
+# Render blueprint for the TypeRush backend (Spring Boot web service).
+#
+# Two ways to deploy, pick one:
+#
+#   A) This blueprint (Render builds from source).  New > Blueprint > point Render at this repo,
+#      fill in the sync:false secrets. Simplest, no registry involved.
+#
+#   B) CI-built image (the workflow in .github/workflows/docker-push.yml pushes to Docker Hub on
+#      every push). Render cannot express "deploy this image" in a blueprint, so the service is
+#      created once through the Render API with an `image` block and thereafter redeployed by the
+#      workflow's deploy hook. See DEPLOY.md for the exact curl.
+#
+# Free-plan caveats: the instance sleeps after ~15 minutes of inactivity and takes ~30-60s to wake on
+# the next request, and it is shared with other free services. A racer who opens the page while the
+# server is cold will wait on the wake-up. Use plan: starter for a game that must stay warm.
+
+services:
+  - type: web
+    name: type-race-backend
+    runtime: java
+    plan: free
+    region: singapore
+    buildCommand: mvn -B -DskipTests package
+    startCommand: java -Dserver.port=$PORT -jar target/typerush-server-1.0.0.jar
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: JAVA_VERSION
+        value: "21"
+      # jdbc:mysql://sql12.freesqldatabase.com:3306/sql?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
+      - key: DB_URL
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      # Exact frontend origin, comma separated, no trailing slash.
+      # e.g. https://type-race-fe.onrender.com
+      - key: CORS_ORIGINS
+        sync: false
+      # Shared/free MySQL hosts cap concurrent connections.
+      - key: DB_POOL_SIZE
+        value: "5"

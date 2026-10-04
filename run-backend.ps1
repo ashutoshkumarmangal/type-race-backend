@@ -13,6 +13,9 @@ Get-CimInstance Win32_Process -Filter "Name='java.exe'" |
 
 Start-Sleep -Seconds 1
 
+# Pin the port so the app and the Vite proxy can never disagree.
+$env:SERVER_PORT = '8081'
+
 if (-not $SkipBuild) {
     Push-Location $root
     mvn -q package -DskipTests

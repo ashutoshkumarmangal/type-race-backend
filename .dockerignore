@@ -1,0 +1,17 @@
+target/
+*.jar
+*.log
+*.err.log
+server.log
+server.err.log
+.git/
+.github/
+.idea/
+*.iml
+.vscode/
+.mvn/
+mvnw
+mvnw.cmd
+Dockerfile
+.dockerignore
+render.yaml

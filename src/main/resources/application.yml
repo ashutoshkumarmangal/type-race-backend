@@ -1,5 +1,6 @@
 server:
-  port: ${SERVER_PORT:8082}
+  # Render (and most PaaS) inject PORT; local dev uses SERVER_PORT.
+  port: ${PORT:${SERVER_PORT:8081}}
   shutdown: graceful
 
 spring:
@@ -10,7 +11,9 @@ spring:
     username: ${DB_USER:typerush}
     password: ${DB_PASSWORD:typerush}
     hikari:
-      maximum-pool-size: 12
+      # Shared/free MySQL hosts cap concurrent connections, so stay small.
+      maximum-pool-size: ${DB_POOL_SIZE:5}
+      connection-timeout: 10000
       pool-name: typerush-pool
   jpa:
     hibernate:

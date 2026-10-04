@@ -1,0 +1,31 @@
+# Build output
+target/
+bin/
+out/
+*.jar
+*.war
+*.class
+
+# Logs and runtime files
+*.log
+logs/
+server.log
+server.err.log
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local overrides
+.env
+.env.local
