@@ -1,10 +1,22 @@
 # Deploying TypeRush
 
 - Backend → Render web service (Docker Hub image built by GitHub Actions)
-- Frontend → Render static site
-- Database → your shared MySQL host
+- Frontend → Vercel
+- Database → shared MySQL host
 
 The password lives only in Render's environment and GitHub secrets. Nothing sensitive is committed.
+
+## Database compatibility
+
+The schema deliberately avoids `DATETIME(6)`, so it also works on old MySQL 5.5 hosts. Verified against
+MySQL 5.5.62: tables create, 12 texts seed, and race results persist.
+
+Two limitations of very old hosts:
+
+- Tables inherit the server's default charset. If your host reports `latin1`, nicknames outside
+  Latin-1 (CJK, emoji) will fail to save; the race itself still completes. A MySQL 8 host removes this.
+- Shared free hosts are slow and occasionally drop connections at startup. The app retries, but the
+  first boot can log a `Communications link failure` before succeeding.
 
 ---
 
@@ -49,28 +61,33 @@ Render can only be told "use this image" through its API (a blueprint cannot exp
 2. PowerShell:
 
 ```powershell
-$r = @{ key = 'rnd_YOUR_KEY' } | ConvertTo-Json
+$headers = @{ Authorization = 'Bearer rnd_YOUR_KEY'; 'Content-Type' = 'application/json' }
+
+# Fill in the four DB values below. Do not commit them anywhere.
+$db = @{
+  host = 'your-mysql-host'
+  port = 3306
+  name = 'your-db-name'
+  user = 'your-db-user'
+  pass = 'your-db-password'
+}
+$jdbc = "jdbc:mysql://$($db.host):$($db.port)/$($db.name)?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8"
 
 $body = @{
-  name           = 'type-race-backend'
-  image = @{
-    owner     = 'YOUR_DOCKERHUB_USERNAME'
-    imageName = 'type-race-backend'
-    tag       = 'master'
-  }
-  plan = 'free'
-  region = 'singapore'
+  name    = 'type-race-backend'
+  image   = @{ owner = 'YOUR_DOCKERHUB_USERNAME'; imageName = 'type-race-backend'; tag = 'master' }
+  plan    = 'free'
+  region  = 'singapore'
   envVars = @(
-    @{ key = 'DB_URL';      value = 'jdbc:mysql://HOST:3306/DB?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8' }
-    @{ key = 'DB_USER';     value = 'DB_USER' }
-    @{ key = 'DB_PASSWORD'; value = 'DB_PASSWORD' }
-    @{ key = 'CORS_ORIGINS'; value = 'https://YOUR-FRONTEND.onrender.com' }
+    @{ key = 'DB_URL';       value = $jdbc }
+    @{ key = 'DB_USER';      value = $db.user }
+    @{ key = 'DB_PASSWORD';  value = $db.pass }
+    @{ key = 'CORS_ORIGINS'; value = 'https://YOUR-FRONTEND.vercel.app' }
     @{ key = 'DB_POOL_SIZE'; value = '5' }
   )
 } | ConvertTo-Json -Depth 5
 
-Invoke-RestMethod -Uri 'https://api.render.com/v1/services' -Method Post `
-  -Headers @{ Authorization = "Bearer $r"; 'Content-Type' = 'application/json' } -Body $body
+Invoke-RestMethod -Uri 'https://api.render.com/v1/services' -Method Post -Headers $headers -Body $body
 ```
 
 `PORT` is injected by Render automatically — do not set it. The jar reads `PORT` first and falls back
@@ -92,26 +109,26 @@ deploy genuinely re-pulls the new image rather than reusing a cached layer.
 
 Check the service's **Events** tab to see which tag was deployed.
 
-## 5. Frontend static site
+## 5. Frontend on Vercel
 
-New repo for `E:\typing-race\frontend`, then Render → New → Static Site, connect the repo:
+`E:\typing-race\frontend` is set up for Vercel (`vercel.json` pins the Vite build and the SPA fallback):
 
-| Setting | Value |
-| --- | --- |
-| Build command | `npm ci && npm run build` |
-| Publish path | `dist` |
-
-Environment variables (build time — Vite inlines them, so re-deploy after changing):
+1. Vercel → Add New → Project → import `ashutoshkumarmangal/type-race-fe`. Framework preset: Vite.
+2. Settings → Environment Variables (apply to **Production**, and Preview if you want previews working):
 
 | Key | Value |
 | --- | --- |
 | `VITE_API_BASE` | `https://type-race-backend.onrender.com` |
 | `VITE_WS_URL` | `wss://type-race-backend.onrender.com/ws/game` |
 
-No trailing slashes. Leave them blank if the frontend is served from the same origin as the API.
+3. Deploy. Vite inlines these at build time, so after changing them press **Redeploy** — editing the
+   variable alone does not rebuild the bundle.
 
-`CORS_ORIGINS` on the backend must contain the exact frontend origin — including the scheme and
-without a trailing path — or the WebSocket handshake is rejected by the browser.
+Then set `CORS_ORIGINS` on the Render backend to the exact Vercel origin
+(`https://<your-project>.vercel.app`, no trailing slash) and restart the backend, or the WebSocket
+handshake will be rejected by the browser.
+
+Leave the variables blank if the frontend is ever served from the same origin as the API.
 
 ## 6. End-to-end check
 
