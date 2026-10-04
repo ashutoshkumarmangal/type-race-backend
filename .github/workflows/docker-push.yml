@@ -63,8 +63,23 @@ jobs:
 
       # Optional: if RENDER_DEPLOY_HOOK is set, ask Render to pull the new tag.
       # The tag is unique per commit, so Render genuinely re-pulls instead of reusing a cache.
+      #
+      # `secrets` is not available in an `if:` expression, so the presence check is done in a shell
+      # step and its output drives the condition.
+      - name: Check for Render deploy hook
+        id: hook
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -n "$DEPLOY_HOOK" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "RENDER_DEPLOY_HOOK not set, skipping deploy trigger"
+          fi
+
       - name: Trigger Render deploy
-        if: ${{ secrets.RENDER_DEPLOY_HOOK != '' }}
+        if: steps.hook.outputs.enabled == 'true'
         env:
           DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
           IMAGE_TAG: ${{ steps.meta.outputs.version }}

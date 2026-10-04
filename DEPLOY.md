@@ -16,13 +16,14 @@ The password lives only in Render's environment and GitHub secrets. Nothing sens
 
 ## 2. Push the backend to GitHub
 
+Already done — the repo is live at `github.com/ashutoshkumarmangal/type-race-backend`. From here on,
+every push to `master` triggers the image build:
+
 ```powershell
 cd E:\typing-race\backend
-git init -b master
 git add .
-git commit -m "backend: Spring Boot realtime typing race server"
-git remote add origin https://github.com/ashutoshkumarmangal/type-race-backend.git
-git push -u origin master
+git commit -m "..."
+git push origin master
 ```
 
 Then in the repo: **Settings → Secrets and variables → Actions → New repository secret**:
