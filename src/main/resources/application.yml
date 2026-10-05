@@ -35,8 +35,9 @@ logging:
 
 typerush:
   game:
-    # Minimum players before a room may start a race.
-    min-players: 2
+    # Minimum racers before a room may start. 1 lets a lone player race solo and still get a full
+    # result; quick match still waits for `quick-match.pair-size` opponents before pairing anyone.
+    min-players: 1
     # Max players in one room (group race).
     max-players: 8
     # Length in characters of a race text.
