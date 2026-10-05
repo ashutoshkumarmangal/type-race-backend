@@ -13,6 +13,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typerush.protocol.ClientCommand;
 import com.typerush.protocol.server.Payloads;
+import com.typerush.security.AuthHandshakeInterceptor;
+import com.typerush.security.GamePrincipal;
 
 /**
  * WebSocket entry point at {@code /ws/game}.
@@ -36,21 +38,33 @@ public class GameSocketHandler extends TextWebSocketHandler {
         this.roomManager = roomManager;
     }
 
+    /**
+     * {@link AuthHandshakeInterceptor} has already rejected anything without a valid token, so a
+     * principal here is guaranteed. Deriving the slot from it, rather than from the client's opening
+     * message, is what closes the impersonation hole the nickname flow used to have.
+     */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
+        GamePrincipal principal = (GamePrincipal) session.getPrincipal();
+        if (principal == null) {
+            log.warn("socket {} opened without a principal; closing", session.getId());
+            sender.closeQuietly(session);
+            return;
+        }
         sender.register(session);
-        log.debug("socket open: {}", session.getId());
+        if (roomManager.onConnect(session, principal) == null) {
+            sender.closeQuietly(session);
+            return;
+        }
+        log.debug("socket open: {} as {}", session.getId(), principal.username());
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
         Optional<PlayerSlot> slotRef = roomManager.player(session.getId());
         if (slotRef.isEmpty()) {
-            ClientCommand raw = parse(message.getPayload());
-            roomManager.onConnect(session, raw == null ? null : raw.nickname());
-            if (raw != null && raw.type() != null && !"ping".equals(raw.type()) && !"hello".equals(raw.type())) {
-                route(session.getId(), raw);
-            }
+            // The opening message used to carry the nickname. It now carries nothing that matters;
+            // the slot was already created in afterConnectionEstablished.
             return;
         }
 

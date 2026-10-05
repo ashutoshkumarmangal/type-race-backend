@@ -22,6 +22,7 @@ import com.typerush.config.GameProperties;
 import com.typerush.persistence.TextSnippet;
 import com.typerush.protocol.ClientCommand;
 import com.typerush.protocol.server.Payloads;
+import com.typerush.security.GamePrincipal;
 
 /**
  * The whole game: room lifecycle, matchmaking, race clocking and validation.
@@ -59,10 +60,21 @@ public class RoomManager {
 
     // ------------------------------------------------------------------ session lifecycle
 
-    /** Registers a socket. The slot stays outside any room until the client asks to play. */
-    public PlayerSlot onConnect(WebSocketSession session, String nickname) {
-        String clean = sanitizeNickname(nickname);
+    /**
+     * Registers a socket. The slot stays outside any room until the client asks to play.
+     *
+     * <p>The nickname comes from the verified principal attached during the handshake, never from the
+     * client's first message, so a racer cannot claim to be somebody else.
+     */
+    public PlayerSlot onConnect(WebSocketSession session, GamePrincipal principal) {
+        if (liveSocketsFor(principal.playerId()) >= properties.getAuth().getSocketsPerAccount()) {
+            log.info("Player {} hit the live-socket cap; refusing socket {}",
+                    principal.playerId(), session.getId());
+            return null;
+        }
+        String clean = principal.nickname();
         PlayerSlot slot = new PlayerSlot(session, clean, ThreadLocalRandom.current().nextInt(8));
+        slot.setPlayerId(principal.playerId());
         playersBySession.put(session.getId(), slot);
         sender.send(session.getId(), "welcome",
                 new Payloads.Welcome(slot.getId(), clean, slot.getAvatarColor(), System.currentTimeMillis()));
@@ -73,13 +85,28 @@ public class RoomManager {
         return Optional.ofNullable(playersBySession.get(sessionId));
     }
 
-    /** Nickname change while already connected (lobby screen only, never mid-race). */
+    private long liveSocketsFor(long playerId) {
+        return playersBySession.values().stream().filter(slot -> slot.getPlayerId() == playerId).count();
+    }
+
+    /**
+     * Display-name change while connected.
+     *
+     * <p>The name on the socket is now the account's, so a rename no longer proves who you are: it is
+     * only cosmetic, and the account behind the slot is unchanged. Spoofing a rival's name is still
+     * possible here, so the server clamps it against names already in play and persistence keys off
+     * the player id rather than the display string.
+     */
     public void rename(PlayerSlot slot, String nickname) {
         String clean = sanitizeNickname(nickname);
         GameRoom room = findRoomOf(slot);
         if (room != null) {
             synchronized (room.lock()) {
                 if (room.getPhase() == Phase.RACING || room.getPhase() == Phase.COUNTDOWN) {
+                    return;
+                }
+                if (nameTakenInRoom(room, slot, clean)) {
+                    error(slot, "nickname_taken", "Someone in this room is already using that name.");
                     return;
                 }
                 slot.setNickname(clean);
@@ -91,6 +118,11 @@ public class RoomManager {
         slot.setNickname(clean);
         sender.send(slot.getSession().getId(), "welcome",
                 new Payloads.Welcome(slot.getId(), clean, slot.getAvatarColor(), System.currentTimeMillis()));
+    }
+
+    private boolean nameTakenInRoom(GameRoom room, PlayerSlot self, String nickname) {
+        return room.players().stream()
+                .anyMatch(p -> p != self && p.getNickname().equalsIgnoreCase(nickname));
     }
 
     public void onDisconnect(String sessionId) {
@@ -525,8 +557,8 @@ public class RoomManager {
 
             if (player.getNickname() != null) {
                 records.add(new ResultPersistenceService.RaceRecord(room.getRaceId(), player.getNickname(),
-                        dnf ? fieldSize : place, fieldSize, wpm, rawWpm, accuracy, player.getCorrectChars(),
-                        player.getErrors(), durationMs, !dnf, player.isFlagged(),
+                        player.getPlayerId(), dnf ? fieldSize : place, fieldSize, wpm, rawWpm, accuracy,
+                        player.getCorrectChars(), player.getErrors(), durationMs, !dnf, player.isFlagged(),
                         room.getSnippet() == null ? null : room.getSnippet().getId()));
             }
         }

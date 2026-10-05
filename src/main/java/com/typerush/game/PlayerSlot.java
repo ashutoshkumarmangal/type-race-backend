@@ -13,6 +13,7 @@ public class PlayerSlot {
 
     private final String id = UUID.randomUUID().toString().substring(0, 8);
     private final WebSocketSession session;
+    private Long playerId;
     private String nickname;
     private String avatarColor;
     private boolean host;
@@ -57,6 +58,15 @@ public class PlayerSlot {
 
     public WebSocketSession getSession() {
         return session;
+    }
+
+    /** The authenticated account behind this slot. Null only for pre-auth test fixtures. */
+    public Long getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(Long playerId) {
+        this.playerId = playerId;
     }
 
     public String getNickname() {

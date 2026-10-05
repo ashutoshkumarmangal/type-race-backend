@@ -30,6 +30,23 @@ public class Player {
     @Column(name = "nickname_key", nullable = false, unique = true, length = 40)
     private String nicknameKey;
 
+    /** Login identity. Immutable after registration; never shown where the nickname is shown. */
+    @Column(length = 32)
+    private String username;
+
+    /** Upper-cased username, unique, so login is case-insensitive. */
+    @Column(name = "username_key", unique = true, length = 32)
+    private String usernameKey;
+
+    @Column(name = "password_hash", length = 100)
+    private String passwordHash;
+
+    @Column(nullable = false, length = 16)
+    private String role = "player";
+
+    @Column(name = "last_login_at")
+    private Instant lastLoginAt;
+
     @Column(name = "races_played", nullable = false)
     private int racesPlayed;
 
@@ -54,12 +71,10 @@ public class Player {
     @Column(name = "total_typing_ms", nullable = false)
     private long totalTypingMs;
 
-    // Plain DATETIME rather than DATETIME(6): MySQL 5.5 (some free hosts) rejects fractional
-    // seconds. Second precision is all this data needs.
-    @Column(name = "created_at", nullable = false, columnDefinition = "datetime")
+    @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    @Column(name = "last_seen_at", nullable = false, columnDefinition = "datetime")
+    @Column(name = "last_seen_at", nullable = false)
     private Instant lastSeenAt;
 
     @PrePersist
@@ -94,6 +109,48 @@ public class Player {
 
     public String getNicknameKey() {
         return nicknameKey;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+        this.usernameKey = username == null ? null : username.toLowerCase();
+    }
+
+    public String getUsernameKey() {
+        return usernameKey;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public Instant getLastLoginAt() {
+        return lastLoginAt;
+    }
+
+    public void setLastLoginAt(Instant lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
+
+    /** True for rows created before accounts existed, which can never authenticate. */
+    public boolean isCredentialed() {
+        return usernameKey != null && passwordHash != null;
     }
 
     public int getRacesPlayed() {

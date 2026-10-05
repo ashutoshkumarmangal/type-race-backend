@@ -15,8 +15,6 @@ public interface RaceResultRepository extends JpaRepository<RaceResult, Long> {
 
     List<RaceResult> findByPlayerIdOrderByCreatedAtDesc(Long playerId, Pageable pageable);
 
-    List<RaceResult> findByNicknameOrderByCreatedAtDesc(String nickname, Pageable pageable);
-
     @Query("""
             SELECT r FROM RaceResult r
             WHERE r.finished = true AND r.flagged = false

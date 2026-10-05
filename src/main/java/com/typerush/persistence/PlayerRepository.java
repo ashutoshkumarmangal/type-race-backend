@@ -12,6 +12,12 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     Optional<Player> findByNicknameKey(String nicknameKey);
 
+Optional<Player> findByUsernameKey(String usernameKey);
+
+boolean existsByUsernameKey(String usernameKey);
+
+boolean existsByNicknameKey(String nicknameKey);
+
     @Query("""
             SELECT p FROM Player p
             ORDER BY p.bestWpm DESC, p.wins DESC, p.racesPlayed ASC

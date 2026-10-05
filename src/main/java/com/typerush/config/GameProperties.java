@@ -9,6 +9,7 @@ public class GameProperties {
 
     private Game game = new Game();
     private Cors cors = new Cors();
+    private Auth auth = new Auth();
 
     public Game getGame() {
         return game;
@@ -24,6 +25,14 @@ public class GameProperties {
 
     public void setCors(Cors cors) {
         this.cors = cors;
+    }
+
+    public Auth getAuth() {
+        return auth;
+    }
+
+    public void setAuth(Auth auth) {
+        this.auth = auth;
     }
 
     public static class Game {
@@ -149,6 +158,108 @@ public class GameProperties {
 
         public void setAllowedOrigins(List<String> allowedOrigins) {
             this.allowedOrigins = allowedOrigins;
+        }
+    }
+
+    public static class Auth {
+        /** HMAC secret for access tokens. Must be overridden in production. */
+        private String jwtSecret = "dev-only-insecure-secret-change-me-before-deploying-anywhere";
+        /** Access token lifetime in seconds. Kept short; the socket lives longer than this. */
+        private long accessTtlSeconds = 900;
+        /** Refresh token lifetime in days. */
+        private long refreshTtlDays = 30;
+        private int bcryptCost = 12;
+        /** Failed logins per IP before a cool-off. */
+        private int loginAttemptsPerIp = 20;
+        /** Failed logins per username before that account is locked out. */
+        private int loginAttemptsPerUser = 8;
+        /** Registration attempts allowed per IP within the window. */
+        private int registrationsPerIp = 5;
+        /** Simultaneous sockets one account may hold open. */
+        private int socketsPerAccount = 4;
+        /** Rooms one account may create within the window. */
+        private int roomsPerHour = 30;
+        /** Cool-off applied once a limiter trips, in seconds. */
+        private long limitCooldownSeconds = 900;
+
+        public String getJwtSecret() {
+            return jwtSecret;
+        }
+
+        public void setJwtSecret(String jwtSecret) {
+            this.jwtSecret = jwtSecret;
+        }
+
+        public long getAccessTtlSeconds() {
+            return accessTtlSeconds;
+        }
+
+        public void setAccessTtlSeconds(long accessTtlSeconds) {
+            this.accessTtlSeconds = accessTtlSeconds;
+        }
+
+        public long getRefreshTtlDays() {
+            return refreshTtlDays;
+        }
+
+        public void setRefreshTtlDays(long refreshTtlDays) {
+            this.refreshTtlDays = refreshTtlDays;
+        }
+
+        public int getBcryptCost() {
+            return bcryptCost;
+        }
+
+        public void setBcryptCost(int bcryptCost) {
+            this.bcryptCost = bcryptCost;
+        }
+
+        public int getLoginAttemptsPerIp() {
+            return loginAttemptsPerIp;
+        }
+
+        public void setLoginAttemptsPerIp(int loginAttemptsPerIp) {
+            this.loginAttemptsPerIp = loginAttemptsPerIp;
+        }
+
+        public int getLoginAttemptsPerUser() {
+            return loginAttemptsPerUser;
+        }
+
+        public void setLoginAttemptsPerUser(int loginAttemptsPerUser) {
+            this.loginAttemptsPerUser = loginAttemptsPerUser;
+        }
+
+        public int getRegistrationsPerIp() {
+            return registrationsPerIp;
+        }
+
+        public void setRegistrationsPerIp(int registrationsPerIp) {
+            this.registrationsPerIp = registrationsPerIp;
+        }
+
+        public int getSocketsPerAccount() {
+            return socketsPerAccount;
+        }
+
+        public void setSocketsPerAccount(int socketsPerAccount) {
+            this.socketsPerAccount = socketsPerAccount;
+        }
+
+        public int getRoomsPerHour() {
+            return roomsPerHour;
+        }
+
+        public void setRoomsPerHour(int roomsPerHour) {
+            this.roomsPerHour = roomsPerHour;
+        }
+
+        public long getLimitCooldownSeconds() {
+            return limitCooldownSeconds;
+        }
+
+        public void setLimitCooldownSeconds(long limitCooldownSeconds) {
+            this.limitCooldownSeconds = limitCooldownSeconds;
         }
     }
 }

@@ -59,3 +59,16 @@ typerush:
       rematch-delay-ms: 4000
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173}
+  auth:
+    # Override in production: Render dashboard -> Environment -> AUTH_JWT_SECRET
+    # Must be at least 32 characters.
+    jwt-secret: ${AUTH_JWT_SECRET:dev-only-insecure-secret-change-me-before-deploying-anywhere}
+    access-ttl-seconds: ${AUTH_ACCESS_TTL:900}
+    refresh-ttl-days: ${AUTH_REFRESH_TTL_DAYS:30}
+    bcrypt-cost: ${AUTH_BCRYPT_COST:12}
+    login-attempts-per-ip: ${AUTH_LOGIN_PER_IP:20}
+    login-attempts-per-user: ${AUTH_LOGIN_PER_USER:8}
+    registrations-per-ip: ${AUTH_REGISTER_PER_IP:5}
+    sockets-per-account: ${AUTH_SOCKETS_PER_ACCOUNT:4}
+    rooms-per-hour: ${AUTH_ROOMS_PER_HOUR:30}
+    limit-cooldown-seconds: ${AUTH_LIMIT_COOLDOWN:900}

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import com.typerush.persistence.RaceResult;
 import com.typerush.persistence.RaceResultRepository;
 import com.typerush.persistence.TextSnippet;
 import com.typerush.persistence.TextSnippetRepository;
+import com.typerush.security.GamePrincipal;
 
 @RestController
 @RequestMapping("/api")
@@ -50,14 +52,40 @@ public class StatsController {
         return resultRepository.findBestPlaceByPlayerId(p.getId()).orElse(0);
     }
 
-    @GetMapping("/players/{nickname}/races")
-    public List<RaceHistoryItem> history(@PathVariable String nickname,
+    /**
+     * The caller's own race history.
+     *
+     * <p>Reading it requires the same account the results belong to: the id comes from the verified
+     * principal, never from the path, so there is no way to walk another player's history.
+     */
+@GetMapping("/me/races")
+    public List<RaceHistoryItem> myHistory(@AuthenticationPrincipal GamePrincipal principal,
             @RequestParam(defaultValue = "10") int limit) {
-        return resultRepository.findByNicknameOrderByCreatedAtDesc(nickname, PageRequest.of(0, clamp(limit, 1, 50)))
+        return resultRepository.findByPlayerIdOrderByCreatedAtDesc(principal.playerId(),
+                PageRequest.of(0, clamp(limit, 1, 50)))
                 .stream()
                 .map(RaceHistoryItem::of)
                 .toList();
     }
+
+    /** The signed-in account, used by the frontend to render the profile without a second guess. */
+    @GetMapping("/me")
+    public Me me(@AuthenticationPrincipal GamePrincipal principal) {
+        return playerRepository.findById(principal.playerId())
+                .map(p -> new Me(p.getId(), p.getUsername(), p.getNickname(), p.getRole(), p.getLastLoginAt()))
+                .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException(
+                        "account no longer exists"));
+    }
+
+    @GetMapping("/me/stats")
+    public PlayerSummary myStats(@AuthenticationPrincipal GamePrincipal principal) {
+        Player player = playerRepository.findById(principal.playerId())
+                .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException(
+                        "account no longer exists"));
+        return PlayerSummary.of(player, bestPlace(player));
+    }
+
+    /** Deliberately absent: any {@code /api/players/{name}/races} route. History is not public. */
 
     @GetMapping("/leaderboard")
     public List<LeaderboardEntry> leaderboard(@RequestParam(defaultValue = "20") int limit) {
@@ -106,6 +134,9 @@ public class StatsController {
             return new RaceHistoryItem(r.getRaceId(), r.getPlace(), r.isFinished(), r.isFlagged(), r.getWpm(),
                     r.getAccuracy(), r.getCorrectChars(), r.getErrorChars(), r.getDurationMs(), r.getCreatedAt());
         }
+    }
+
+    public record Me(Long id, String username, String nickname, String role, Instant lastLoginAt) {
     }
 
     public record TextItem(Long id, String category, int charCount, String preview) {

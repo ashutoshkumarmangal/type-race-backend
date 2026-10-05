@@ -67,7 +67,7 @@ public class RaceResult {
     @Column(name = "text_id")
     private Long textId;
 
-    @Column(name = "created_at", nullable = false, columnDefinition = "datetime")
+    @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
     @PrePersist

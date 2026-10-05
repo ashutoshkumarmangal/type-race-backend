@@ -49,13 +49,7 @@ public class ResultPersistenceService {
 
     @Transactional
     void persist(RaceRecord record) {
-        Player player = playerRepository.findByNicknameKey(record.nickname().toUpperCase())
-                .orElseGet(() -> {
-                    Player created = new Player();
-                    created.setNickname(record.nickname());
-                    return created;
-                });
-        playerRepository.saveAndFlush(player);
+        Player player = resolvePlayer(record);
 
         RaceResult result = RaceResult.of(record.raceId(), player, record.place(), record.fieldSize(),
                 record.wpm(), record.rawWpm(), record.accuracy(), record.correctChars(), record.errors(),
@@ -73,14 +67,38 @@ public class ResultPersistenceService {
                 record.place(), record.wpm(), record.flagged());
     }
 
+    /**
+     * Resolves the account behind a result.
+     *
+     * <p>Previously the nickname from the socket decided which {@code Player} row absorbed the score,
+     * which meant any client could credit itself under another racer's name by sending a different
+     * nickname. Identity now comes from the authenticated principal and the id is looked up directly;
+     * the nickname is only used for display and for legacy rows that predate accounts.
+     */
+    private Player resolvePlayer(RaceRecord record) {
+        if (record.playerId() != null) {
+            return playerRepository.findById(record.playerId()).orElse(null);
+        }
+        return playerRepository.findByNicknameKey(record.nickname().toUpperCase())
+                .orElseGet(() -> {
+                    Player created = new Player();
+                    created.setNickname(record.nickname());
+                    return playerRepository.saveAndFlush(created);
+                });
+    }
+
     @PreDestroy
     void shutdown() {
         writer.shutdown();
     }
 
-    /** Immutable snapshot of one player's outcome at race close. */
-    public record RaceRecord(String raceId, String nickname, int place, int fieldSize, double wpm, double rawWpm,
-            double accuracy, int correctChars, int errors, long durationMs, boolean finished, boolean flagged,
-            Long textId) {
+    /**
+     * Immutable snapshot of one player's outcome at race close.
+     *
+     * @param playerId authenticated account id; authoritative for crediting stats
+     */
+    public record RaceRecord(String raceId, String nickname, Long playerId, int place, int fieldSize, double wpm,
+            double rawWpm, double accuracy, int correctChars, int errors, long durationMs, boolean finished,
+            boolean flagged, Long textId) {
     }
 }
